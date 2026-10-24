@@ -1,0 +1,997 @@
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة ملء الكلمات - سورة الفجر</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Amiri', 'Tajawal', serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 50%, #0d1f3c 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+
+        .start-screen h1 {
+            font-size: 3rem;
+            color: #ffd700;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .start-screen h2 {
+            font-size: 2rem;
+            color: #c9a84c;
+            margin-bottom: 30px;
+        }
+
+        .start-screen .subtitle {
+            font-size: 1.3rem;
+            color: #a0c4ff;
+            margin-bottom: 40px;
+            line-height: 2;
+        }
+
+        .bismillah {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 30px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn {
+            padding: 15px 50px;
+            font-size: 1.4rem;
+            font-family: 'Amiri', serif;
+            border: 2px solid #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            color: #ffd700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.1));
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Game Screen */
+        .game-screen {
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .score {
+            font-size: 1.3rem;
+            color: #ffd700;
+        }
+
+        .progress {
+            font-size: 1.1rem;
+            color: #a0c4ff;
+        }
+
+        .verse-number {
+            background: linear-gradient(135deg, #ffd700, #c9a84c);
+            color: #0a1628;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .verse-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verse-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+        }
+
+        .verse-text {
+            font-size: 2.2rem;
+            line-height: 2.5;
+            text-align: center;
+            color: #fff;
+            direction: rtl;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 120px;
+            padding: 5px 15px;
+            border: 2px dashed #ffd700;
+            border-radius: 10px;
+            margin: 0 5px;
+            background: rgba(255, 215, 0, 0.05);
+            color: #ffd700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .blank:hover {
+            background: rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .blank.filled {
+            border-style: solid;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .blank.correct {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .blank.incorrect {
+            border-color: #f44336;
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .choices-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .choice-btn {
+            padding: 12px 25px;
+            font-size: 1.5rem;
+            font-family: 'Amiri', serif;
+            border: 2px solid rgba(160, 196, 255, 0.4);
+            background: rgba(160, 196, 255, 0.05);
+            color: #a0c4ff;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .choice-btn:hover {
+            background: rgba(160, 196, 255, 0.15);
+            border-color: #a0c4ff;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(160, 196, 255, 0.2);
+        }
+
+        .choice-btn:active {
+            transform: translateY(0);
+        }
+
+        .choice-btn.used {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+
+        .choice-btn.correct-choice {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .choice-btn.incorrect-choice {
+            border-color: #f44336;
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.3rem;
+            min-height: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .feedback.correct {
+            color: #4caf50;
+        }
+
+        .feedback.incorrect {
+            color: #f44336;
+        }
+
+        .next-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 40px;
+            font-size: 1.2rem;
+            font-family: 'Amiri', serif;
+            border: 2px solid #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:hover {
+            background: rgba(76, 175, 80, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* End Screen */
+        .end-screen {
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+
+        .end-screen h1 {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .end-screen .final-score {
+            font-size: 4rem;
+            color: #4caf50;
+            margin: 20px 0;
+        }
+
+        .end-screen .message {
+            font-size: 1.5rem;
+            color: #a0c4ff;
+            margin-bottom: 30px;
+            line-height: 2;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px 30px;
+            text-align: center;
+        }
+
+        .stat-item .stat-value {
+            font-size: 2rem;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .stat-item .stat-label {
+            font-size: 1rem;
+            color: #a0c4ff;
+        }
+
+        .decoration {
+            font-size: 3rem;
+            color: #ffd700;
+            margin: 20px 0;
+            opacity: 0.6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #4caf50);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Level indicator */
+        .level-indicator {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .level-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .level-dot.completed {
+            background: #4caf50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .level-dot.current {
+            background: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .level-dot.failed {
+            background: #f44336;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .start-screen h1 {
+                font-size: 2rem;
+            }
+            .start-screen h2 {
+                font-size: 1.5rem;
+            }
+            .verse-text {
+                font-size: 1.6rem;
+                line-height: 2.2;
+            }
+            .blank {
+                min-width: 80px;
+                font-size: 1.4rem;
+            }
+            .choice-btn {
+                font-size: 1.2rem;
+                padding: 10px 18px;
+            }
+            .game-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            .verse-container {
+                padding: 25px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .verse-text {
+                font-size: 1.3rem;
+            }
+            .bismillah {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="container">
+        <!-- Start Screen -->
+        <div class="start-screen" id="startScreen">
+            <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+            <h1>🌙 سورة الفجر 🌙</h1>
+            <h2>لعبة ملء الكلمات المفقودة</h2>
+            <p class="subtitle">
+                اختبر حفظك لسورة الفجر<br>
+                أكمل الكلمات الناقصة في الآيات<br>
+                باختيار الكلمة الصحيحة من الخيارات المتاحة
+            </p>
+            <div class="decoration">✦ ❋ ✦</div>
+            <button class="btn" onclick="startGame()">ابدأ اللعبة</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen hidden" id="gameScreen">
+            <div class="game-header">
+                <div class="score">النقاط: <span id="scoreDisplay">0</span></div>
+                <div class="verse-number" id="verseNum">1</div>
+                <div class="progress">السؤال <span id="currentQ">1</span> من <span id="totalQ">15</span></div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="level-indicator" id="levelIndicator"></div>
+            <div class="verse-container">
+                <div class="verse-text" id="verseText"></div>
+            </div>
+            <div class="choices-container" id="choicesContainer"></div>
+            <div class="feedback" id="feedback"></div>
+            <button class="next-btn hidden" id="nextBtn" onclick="nextQuestion()">الآية التالية ←</button>
+        </div>
+
+        <!-- End Screen -->
+        <div class="end-screen hidden" id="endScreen">
+            <div class="decoration">✦ ❋ ✦</div>
+            <h1>🎉 أحسنت! 🎉</h1>
+            <div class="final-score" id="finalScore">0</div>
+            <p class="message" id="endMessage"></p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="correctCount">0</div>
+                    <div class="stat-label">إجابات صحيحة</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="incorrectCount">0</div>
+                    <div class="stat-label">إجابات خاطئة</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="accuracy">0%</div>
+                    <div class="stat-label">نسبة النجاح</div>
+                </div>
+            </div>
+            <button class="btn" onclick="restartGame()">أعد اللعبة</button>
+        </div>
+    </div>
+
+    <script>
+        // Game Data - Surah Al-Fajr verses with blanks
+        const questions = [
+            {
+                verse: 1,
+                text: "وَٱلْفَجْرِ",
+                display: "وَٱلْـ______",
+                answer: "فَجْرِ",
+                choices: ["فَجْرِ", "صُبْحِ", "نُورِ", "ضُحَى"]
+            },
+            {
+                verse: 2,
+                text: "وَلَيَالٍ عَشْرٍ",
+                display: "وَلَيَالٍ ______",
+                answer: "عَشْرٍ",
+                choices: ["عَشْرٍ", "كَثِيرٍ", "قَلِيلٍ", "سَبْعٍ"]
+            },
+            {
+                verse: 3,
+                text: "وَٱلشَّفْعِ وَٱلْوَتْرِ",
+                display: "وَٱلشَّفْعِ وَٱلْـ______",
+                answer: "وَتْرِ",
+                choices: ["وَتْرِ", "فَرْدِ", "زَوْجِ", "وَحْدِ"]
+            },
+            {
+                verse: 4,
+                text: "وَٱلَّيْلِ إِذَا يَسْرِ",
+                display: "وَٱلَّيْلِ إِذَا ______",
+                answer: "يَسْرِ",
+                choices: ["يَسْرِ", "مَضَى", "ذَهَبَ", "أَقْبَلَ"]
+            },
+            {
+                verse: 5,
+                text: "هَلْ فِى ذَٰلِكَ قَسَمٌ لِّذِى حِجْرٍ",
+                display: "هَلْ فِى ذَٰلِكَ قَسَمٌ لِّذِى ______",
+                answer: "حِجْرٍ",
+                choices: ["حِجْرٍ", "لُبٍّ", "عِلْمٍ", "عَقْلٍ"]
+            },
+            {
+                verse: 6,
+                text: "أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِعَادٍ",
+                display: "أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِـ______",
+                answer: "عَادٍ",
+                choices: ["عَادٍ", "ثَمُودَ", "قَوْمٍ", "نُوحٍ"]
+            },
+            {
+                verse: 7,
+                text: "إِرَمَ ذَاتِ ٱلْعِمَادِ",
+                display: "إِرَمَ ذَاتِ ٱلْـ______",
+                answer: "عِمَادِ",
+                choices: ["عِمَادِ", "بُنْيَانِ", "قِصَارِ", "طُولِ"]
+            },
+            {
+                verse: 8,
+                text: "ٱلَّتِى لَمْ يُخْلَقْ مِثْلُهَا فِى ٱلْبِلَـٰدِ",
+                display: "ٱلَّتِى لَمْ يُخْلَقْ ______ فِى ٱلْبِلَـٰدِ",
+                answer: "مِثْلُهَا",
+                choices: ["مِثْلُهَا", "شِبْهُهَا", "نَظِيرُهَا", "قَرِينُهَا"]
+            },
+            {
+                verse: 9,
+                text: "وَثَمُودَ ٱلَّذِينَ جَابُوا ٱلصَّخْرَ بِٱلْوَادِ",
+                display: "وَثَمُودَ ٱلَّذِينَ ______ ٱلصَّخْرَ بِٱلْوَادِ",
+                answer: "جَابُوا",
+                choices: ["جَابُوا", "قَطَعُوا", "نَحَتُوا", "حَفَرُوا"]
+            },
+            {
+                verse: 10,
+                text: "وَفِرْعَوْنَ ذِى ٱلْأَوْتَادِ",
+                display: "وَفِرْعَوْنَ ذِى ٱلْـ______",
+                answer: "أَوْتَادِ",
+                choices: ["أَوْتَادِ", "جُيُوشِ", "قُصُورِ", "جَبَابِرِ"]
+            },
+            {
+                verse: 11,
+                text: "ٱلَّذِينَ طَغَوْا فِى ٱلْبِلَـٰدِ",
+                display: "ٱلَّذِينَ ______ فِى ٱلْبِلَـٰدِ",
+                answer: "طَغَوْا",
+                choices: ["طَغَوْا", "ظَلَمُوا", "فَسَدُوا", "عَتَوْا"]
+            },
+            {
+                verse: 12,
+                text: "فَأَكْثَرُوا فِيهَا ٱلْفَسَادَ",
+                display: "فَأَكْثَرُوا فِيهَا ٱلْـ______",
+                answer: "فَسَادَ",
+                choices: ["فَسَادَ", "خَرَابَ", "ظُلْمًا", "شَرًّا"]
+            },
+            {
+                verse: 13,
+                text: "فَصَبَّ عَلَيْهِمْ رَبُّكَ سَوْطَ عَذَابٍ",
+                display: "فَصَبَّ عَلَيْهِمْ رَبُّكَ ______ عَذَابٍ",
+                answer: "سَوْطَ",
+                choices: ["سَوْطَ", "لَوْنَ", "ضَرْبَ", "نَوْعَ"]
+            },
+            {
+                verse: 14,
+                text: "إِنَّ رَبَّكَ لَبِٱلْمِرْصَادِ",
+                display: "إِنَّ رَبَّكَ لَبِـ______",
+                answer: "مِرْصَادِ",
+                choices: ["مِرْصَادِ", "مِيعَادِ", "مَرْقَادِ", "مَعَادِ"]
+            },
+            {
+                verse: 17,
+                text: "كَلَّا ۖ بَل لَّا تُكْرِمُونَ ٱلْيَتِيمَ",
+                display: "كَلَّا ۖ بَل لَّا ______ ٱلْيَتِيمَ",
+                answer: "تُكْرِمُونَ",
+                choices: ["تُكْرِمُونَ", "تَرْحَمُونَ", "تُطْعِمُونَ", "تَكْفُلُونَ"]
+            },
+            {
+                verse: 18,
+                text: "وَلَا تَحَـٰٓضُّونَ عَلَىٰ طَعَامِ ٱلْمِسْكِينِ",
+                display: "وَلَا تَحَـٰٓضُّونَ عَلَىٰ طَعَامِ ٱلْـ______",
+                answer: "مِسْكِينِ",
+                choices: ["مِسْكِينِ", "فَقِيرِ", "يَتِيمِ", "ضَعِيفِ"]
+            },
+            {
+                verse: 19,
+                text: "وَتَأْكُلُونَ ٱلتُّرَاثَ أَكْلًا لَّمًّا",
+                display: "وَتَأْكُلُونَ ٱلتُّرَاثَ أَكْلًا ______",
+                answer: "لَمًّا",
+                choices: ["لَمًّا", "كَثِيرًا", "جَمْعًا", "شَدِيدًا"]
+            },
+            {
+                verse: 20,
+                text: "وَتُحِبُّونَ ٱلْمَالَ حُبًّا جَمًّا",
+                display: "وَتُحِبُّونَ ٱلْمَالَ حُبًّا ______",
+                answer: "جَمًّا",
+                choices: ["جَمًّا", "كَثِيرًا", "شَدِيدًا", "عَظِيمًا"]
+            },
+            {
+                verse: 21,
+                text: "كَلَّآ إِذَا دُكَّتِ ٱلْأَرْضُ دَكًّا دَكًّا",
+                display: "كَلَّآ إِذَا ______ ٱلْأَرْضُ دَكًّا دَكًّا",
+                answer: "دُكَّتِ",
+                choices: ["دُكَّتِ", "زُلْزِلَتِ", "رُجَّتِ", "مِيدَتْ"]
+            },
+            {
+                verse: 22,
+                text: "وَجَآءَ رَبُّكَ وَٱلْمَلَكُ صَفًّا صَفًّا",
+                display: "وَجَآءَ رَبُّكَ وَٱلْمَلَكُ ______ ______",
+                answer: "صَفًّا صَفًّا",
+                choices: ["صَفًّا صَفًّا", "فَوْجًا فَوْجًا", "جَمْعًا جَمْعًا", "زُمْرَةً زُمْرَةً"]
+            },
+            {
+                verse: 23,
+                text: "وَجِا۟ئَ يَوْمَئِذٍۭ بِجَهَنَّمَ",
+                display: "وَجِا۟ئَ يَوْمَئِذٍۭ بِـ______",
+                answer: "جَهَنَّمَ",
+                choices: ["جَهَنَّمَ", "النَّارِ", "سَقَرَ", "لَظَى"]
+            },
+            {
+                verse: 24,
+                text: "يَقُولُ يَـٰلَيْتَنِى قَدَّمْتُ لِحَيَاتِى",
+                display: "يَقُولُ يَـٰلَيْتَنِى ______ لِحَيَاتِى",
+                answer: "قَدَّمْتُ",
+                choices: ["قَدَّمْتُ", "عَمِلْتُ", "فَعَلْتُ", "أَرْسَلْتُ"]
+            },
+            {
+                verse: 27,
+                text: "يَـٰٓأَيَّتُهَا ٱلنَّفْسُ ٱلْمُطْمَئِنَّةُ",
+                display: "يَـٰٓأَيَّتُهَا ٱلنَّفْسُ ٱلْـ______",
+                answer: "مُطْمَئِنَّةُ",
+                choices: ["مُطْمَئِنَّةُ", "سَاكِنَةُ", "رَاضِيَةُ", "هَادِئَةُ"]
+            },
+            {
+                verse: 28,
+                text: "ٱرْجِعِىٓ إِلَىٰ رَبِّكِ رَاضِيَةً مَّرْضِيَّةً",
+                display: "ٱرْجِعِىٓ إِلَىٰ رَبِّكِ ______ مَّرْضِيَّةً",
+                answer: "رَاضِيَةً",
+                choices: ["رَاضِيَةً", "فَرِحَةً", "مَسْرُورَةً", "قَانِعَةً"]
+            },
+            {
+                verse: 29,
+                text: "فَٱدْخُلِى فِى عِبَادِى",
+                display: "فَٱدْخُلِى فِى ______",
+                answer: "عِبَادِى",
+                choices: ["عِبَادِى", "جَنَّتِى", "رَحْمَتِى", "نَعِيمِى"]
+            },
+            {
+                verse: 30,
+                text: "وَٱدْخُلِى جَنَّتِى",
+                display: "وَٱدْخُلِى ______",
+                answer: "جَنَّتِى",
+                choices: ["جَنَّتِى", "رَحْمَتِى", "نَعِيمِى", "فِرْدَوْسِى"]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        let selectedQuestions = [];
+        let answeredCorrectly = false;
+        let audioCtx = null;
+
+        // Initialize stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Audio
+        function initAudio() {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playCorrectSound() {
+            if (!audioCtx) initAudio();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+            oscillator.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function playIncorrectSound() {
+            if (!audioCtx) initAudio();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(150, audioCtx.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.4);
+        }
+
+        function playWinSound() {
+            if (!audioCtx) initAudio();
+            const notes = [523.25, 587.33, 659.25, 783.99, 880, 1046.5];
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.15);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.15);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.3);
+                osc.start(audioCtx.currentTime + i * 0.15);
+                osc.stop(audioCtx.currentTime + i * 0.15 + 0.3);
+            });
+        }
+
+        // Shuffle array
+        function shuffleArray(arr) {
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Start game
+        function startGame() {
+            initAudio();
+            selectedQuestions = shuffleArray(questions).slice(0, 15);
+            currentQuestion = 0;
+            score = 0;
+            correctAnswers = 0;
+            incorrectAnswers = 0;
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('endScreen').classList.add('hidden');
+            document.getElementById('totalQ').textContent = selectedQuestions.length;
+
+            createLevelIndicator();
+            loadQuestion();
+        }
+
+        function createLevelIndicator() {
+            const container = document.getElementById('levelIndicator');
+            container.innerHTML = '';
+            for (let i = 0; i < selectedQuestions.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'level-dot';
+                dot.id = 'dot-' + i;
+                container.appendChild(dot);
+            }
+        }
+
+        function updateLevelIndicator() {
+            for (let i = 0; i < selectedQuestions.length; i++) {
+                const dot = document.getElementById('dot-' + i);
+                dot.className = 'level-dot';
+                if (i < currentQuestion) {
+                    dot.classList.add('completed');
+                } else if (i === currentQuestion) {
+                    dot.classList.add('current');
+                }
+            }
+        }
+
+        function loadQuestion() {
+            answeredCorrectly = false;
+            const q = selectedQuestions[currentQuestion];
+            document.getElementById('currentQ').textContent = currentQuestion + 1;
+            document.getElementById('verseNum').textContent = q.verse;
+            document.getElementById('scoreDisplay').textContent = score;
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('nextBtn').classList.add('hidden');
+
+            // Progress bar
+            const progress = ((currentQuestion) / selectedQuestions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            updateLevelIndicator();
+
+            // Build verse with blank
+            const verseText = document.getElementById('verseText');
+            const parts = q.display.split('______');
+            let html = '';
+            for (let i = 0; i < parts.length; i++) {
+                html += parts[i];
+                if (i < parts.length - 1) {
+                    html += `<span class="blank" id="blank-${i}">؟</span>`;
+                }
+            }
+            verseText.innerHTML = html;
+
+            // Build choices
+            const choicesContainer = document.getElementById('choicesContainer');
+            choicesContainer.innerHTML = '';
+            const shuffledChoices = shuffleArray(q.choices);
+            shuffledChoices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice;
+                btn.onclick = () => selectChoice(choice, btn);
+                choicesContainer.appendChild(btn);
+            });
+        }
+
+        function selectChoice(choice, btnElement) {
+            if (answeredCorrectly) return;
+
+            const q = selectedQuestions[currentQuestion];
+            const blank = document.getElementById('blank-0');
+            const feedback = document.getElementById('feedback');
+
+            if (choice === q.answer) {
+                // Correct
+                answeredCorrectly = true;
+                blank.textContent = choice;
+                blank.classList.add('filled', 'correct');
+                btnElement.classList.add('correct-choice');
+                feedback.textContent = '✓ أحسنت! إجابة صحيحة';
+                feedback.className = 'feedback correct';
+                score += 10;
+                correctAnswers++;
+                document.getElementById('scoreDisplay').textContent = score;
+                playCorrectSound();
+
+                // Mark the dot
+                document.getElementById('dot-' + currentQuestion).className = 'level-dot completed';
+
+                // Show next button
+                document.getElementById('nextBtn').classList.remove('hidden');
+
+                // Disable all buttons
+                document.querySelectorAll('.choice-btn').forEach(b => {
+                    if (!b.classList.contains('correct-choice')) {
+                        b.classList.add('used');
+                    }
+                });
+            } else {
+                // Incorrect
+                blank.classList.add('incorrect');
+                btnElement.classList.add('incorrect-choice');
+                btnElement.classList.add('used');
+                feedback.textContent = '✗ حاول مرة أخرى';
+                feedback.className = 'feedback incorrect';
+                incorrectAnswers++;
+                playIncorrectSound();
+
+                // Mark dot as failed if first time
+                const dot = document.getElementById('dot-' + currentQuestion);
+                if (!dot.classList.contains('completed')) {
+                    dot.className = 'level-dot failed';
+                }
+
+                setTimeout(() => {
+                    blank.classList.remove('incorrect');
+                    feedback.textContent = '';
+                }, 1500);
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= selectedQuestions.length) {
+                endGame();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.remove('hidden');
+
+            const accuracy = Math.round((correctAnswers / selectedQuestions.length) * 100);
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('correctCount').textContent = correctAnswers;
+            document.getElementById('incorrectCount').textContent = incorrectAnswers;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+
+            let message = '';
+            if (accuracy === 100) {
+                message = 'ما شاء الله! حفظ ممتاز لسورة الفجر 🌟';
+            } else if (accuracy >= 80) {
+                message = 'أحسنت! حفظك جيد جداً، واصل المراجعة 🌟';
+            } else if (accuracy >= 60) {
+                message = 'جيد! تحتاج لمزيد من المراجعة 📖';
+            } else {
+                message = 'حاول مرة أخرى، راجع السورة وأعد المحاولة 💪';
+            }
+            document.getElementById('endMessage').textContent = message;
+
+            playWinSound();
+        }
+
+        function restartGame() {
+            document.getElementById('endScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+        }
+
+        // Initialize
+        createStars();
+    </script>
+</body>
+</html>
